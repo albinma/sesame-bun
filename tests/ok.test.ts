@@ -6,12 +6,13 @@ describe('Can run tests', () => {
   });
 });
 
-describe('Can receive requests on HTTP server', () => {
-  const app = setupApp();
+describe('HTTP server', () => {
+  const port = Bun.env.HTTP_PORT || 8080;
+  const app = setupApp().listen(port);
 
   afterAll(() => app.stop());
 
-  it('/ should be ok', async () => {
+  it('should return ok', async () => {
     const response = await app
       .handle(new Request('http://localhost/'))
       .then((res) => res.text());
