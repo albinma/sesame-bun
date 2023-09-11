@@ -40,3 +40,9 @@ yarn-error.log*
 **/*.log
 package-lock.json
 **/*.bun
+
+# local env fils files
+.env
+
+# misc
+.DS_Store
