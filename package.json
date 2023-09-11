@@ -9,6 +9,7 @@
     "elysia": "latest"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.4",
     "bun-types": "latest"
   },
   "module": "src/index.js"
