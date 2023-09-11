@@ -1,3 +1,4 @@
+import { authRoutes } from '@/domains/identity/routes';
 import { logger } from '@bogeychan/elysia-logger';
 import Elysia from 'elysia';
 import { helmet } from 'elysia-helmet';
@@ -16,7 +17,8 @@ export function setupApp() {
         level: 'debug',
       }),
     )
-    .get('/', () => 'ok');
+    .get('/', () => 'ok')
+    .use(authRoutes);
 
   return app;
 }
