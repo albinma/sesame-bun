@@ -50,7 +50,7 @@ const formatters = {
   },
 } satisfies LoggerOptions['formatters'];
 
-export const createLogger = (options: LoggerOptions): Logger => {
+const createLogger = (options: LoggerOptions): Logger => {
   if (!options.level) {
     options.level = 'info';
   }
@@ -66,7 +66,4 @@ export const createLogger = (options: LoggerOptions): Logger => {
   return pino(options);
 };
 
-const pinoLogger = createLogger({ level: Bun.env.LOG_LEVEL });
-pinoLogger.info('Logger initialized');
-
-export const logger = pinoLogger;
+export const logger = createLogger({ level: Bun.env.LOG_LEVEL });

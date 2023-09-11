@@ -17,10 +17,9 @@ export const setupApp = () => {
     .onRequest((context) => {
       const { method, url, referrer, referrerPolicy, headers } =
         context.request;
-      context.log.info(
-        { method, url, referrer, referrerPolicy, headers },
-        'request',
-      );
+      context
+        .getLogger()
+        .info({ method, url, referrer, referrerPolicy, headers }, 'request');
     })
     .get('/', () => 'ok')
     .group('/auth', (app) => app.use(authRoutes));

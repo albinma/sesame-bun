@@ -5,7 +5,7 @@ export function register(context: ExecutionContext): void {
     foo: 'bar',
   };
 
-  context.log.info(someObj, 'register');
+  context.getLogger().info(someObj, 'register');
 }
 
 export function verify(context: ExecutionContext): void {
@@ -13,5 +13,5 @@ export function verify(context: ExecutionContext): void {
     foo: 'bar',
   };
 
-  context.log.info(someObj, 'verify');
+  context.getLogger().info(someObj, 'verify');
 }
