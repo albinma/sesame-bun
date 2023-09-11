@@ -1,0 +1,28 @@
+{
+  "parserOptions": { "project": "./tsconfig.json" },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "plugins": ["prettier"],
+  "rules": {
+    "curly": ["error", "all"],
+    "eqeqeq": ["error", "allow-null"],
+    "prettier/prettier": ["warn"],
+    "no-console": ["error"],
+    "no-nested-ternary": ["error"],
+    "no-undef": ["off"],
+    "spaced-comment": ["error", "always", { "markers": ["/"] }],
+
+    // Typescript
+    "@typescript-eslint/no-explicit-any": ["error"],
+    "@typescript-eslint/no-floating-promises": ["error"],
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "@typescript-eslint/no-non-null-assertion": ["error"],
+    "@typescript-eslint/explicit-function-return-type": [
+      "error",
+      { "allowExpressions": true, "allowTypedFunctionExpressions": true }
+    ]
+  }
+}

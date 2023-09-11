@@ -2,15 +2,27 @@
   "name": "sesame-bun",
   "version": "1.0.50",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "test": "bun test --coverage",
+    "format": "prettier --check --ignore-path .gitignore .",
+    "format:fix": "prettier --write --ignore-path .gitignore .",
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix src"
   },
   "dependencies": {
     "elysia": "latest"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.4",
-    "bun-types": "latest"
+    "@types/jest": "29.5.4",
+    "@typescript-eslint/eslint-plugin": "6.6.0",
+    "@typescript-eslint/parser": "6.6.0",
+    "bun-types": "latest",
+    "eslint": "8.49.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-plugin-prettier": "5.0.0",
+    "prettier": "3.0.3",
+    "prettier-plugin-organize-imports": "3.2.3",
+    "typescript": "5.2.2"
   },
   "module": "src/index.js"
 }
