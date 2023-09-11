@@ -18,6 +18,12 @@ First Install packages
 bun install
 ```
 
+Copy .env.example and rename to .env
+
+```bash
+cp .env.example .env
+```
+
 To start the development server run:
 
 ```bash

@@ -1,4 +1,4 @@
-import { setupApp } from '@/api/routes';
+import { setupApp } from '@/global/app';
 
 describe('Can run tests', () => {
   it('should pass', () => {

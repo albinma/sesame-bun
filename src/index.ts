@@ -1,4 +1,4 @@
-import { setupApp } from '@/api/routes';
+import { setupApp } from '@/global/app';
 
 const port = Bun.env.HTTP_PORT || 8080;
 const app = setupApp();
