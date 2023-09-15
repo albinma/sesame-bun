@@ -4,7 +4,7 @@
   "scripts": {
     "env": "cp .env.example .env",
     "dev": "NOD_ENV=development bun run --watch src/index.ts | pino-pretty",
-    "test": "NODE_ENV=test bun test --coverage",
+    "test": "NODE_ENV=test LOG_LEVEL=error bun test --coverage | pino-pretty",
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "lint": "eslint src",
@@ -16,6 +16,7 @@
     "@types/uuid": "9.0.4",
     "bun": "1.0.0",
     "express": "4.18.2",
+    "express-openapi-validator": "^5.0.6",
     "helmet": "^7.0.0",
     "joi": "^17.10.1",
     "pino": "8.15.1",
