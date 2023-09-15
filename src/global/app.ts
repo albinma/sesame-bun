@@ -15,6 +15,7 @@ export const setupApp = (): Express => {
     }),
   );
 
+  // Generate request id that will correlate all logs for a single request.
   app.use((req, res, next) => {
     req.id = v4();
     res.set('X-Request-Id', req.id);
@@ -24,6 +25,7 @@ export const setupApp = (): Express => {
   app.use(
     pinoHttp({
       logger,
+      quietReqLogger: true,
       genReqId: (req) => req.id,
     }),
   );

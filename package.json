@@ -2,8 +2,9 @@
   "name": "sesame-bun",
   "version": "1.0.50",
   "scripts": {
-    "dev": "bun run --watch src/index.ts | pino-pretty",
-    "test": "bun test --coverage",
+    "env": "cp .env.example .env",
+    "dev": "NOD_ENV=development bun run --watch src/index.ts | pino-pretty",
+    "test": "NODE_ENV=test bun test --coverage",
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "lint": "eslint src",
@@ -16,6 +17,7 @@
     "bun": "1.0.0",
     "express": "4.18.2",
     "helmet": "^7.0.0",
+    "joi": "^17.10.1",
     "pino": "8.15.1",
     "pino-http": "8.5.0",
     "uuid": "9.0.1"

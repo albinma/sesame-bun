@@ -24,6 +24,12 @@ Copy .env.example and rename to .env
 cp .env.example .env
 ```
 
+or use the convenience commqand
+
+```bash
+bun run env
+```
+
 To start the development server run:
 
 ```bash
