@@ -11,8 +11,8 @@
       "program": "src/index.ts",
       "cwd": "${workspaceFolder}",
       "stopOnEntry": false,
-      "watchMode": false,
-      "internalConsoleOptions": "neverOpen"
+      "watchMode": true,
+      "internalConsoleOptions": "openOnSessionStart"
     },
     {
       "type": "bun",
