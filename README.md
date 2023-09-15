@@ -1,6 +1,6 @@
 # sesame-bun
 
-API built using [bun](https://bun.sh) and [elysia](https://elysiajs.com).
+API built using [bun](https://bun.sh) and [express](https://expressjs.com/).
 
 ## Getting Started
 
@@ -27,13 +27,13 @@ cp .env.example .env
 To start the development server run:
 
 ```bash
-bun dev
+bun run dev
 ```
 
 To run tests
 
 ```bash
-bun test
+bun run test
 ```
 
-Open http://localhost:3000/ with your browser to see the result.
+Open http://localhost:8080/ with your browser to see the result.
