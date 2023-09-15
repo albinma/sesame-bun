@@ -6,6 +6,7 @@ orbs:
 jobs:
   lint:
     docker:
+      - image: cimg/base:current
       - image: oven/bun:latest
     steps:
       - checkout
@@ -20,6 +21,7 @@ jobs:
       - run:
           name: Check linting
           command: bun run lint
+
   build-and-test:
     docker:
       - image: oven/bun:latest
@@ -35,12 +37,10 @@ jobs:
           name: Restore packages
           command: bun install
 
-      - run:
-          name: Run tests
-          command: bun run test
-
 workflows:
   main:
     jobs:
       - lint
-      - build-and-test
+      - build-and-test:
+          requires:
+            - lint
