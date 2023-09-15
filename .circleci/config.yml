@@ -3,6 +3,18 @@ version: 2.1
 orbs:
   docker: circleci/docker@2.2.0
 
+commands:
+  install-bun:
+    steps:
+      - run:
+          name: 'Install bun'
+          command: |
+            curl -fsSL https://bun.sh/install | bash
+            echo 'export BUN_INSTALL="$HOME/.bun"' >> "$BASH_ENV"
+            echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> "$BASH_ENV"
+            source "$BASH_ENV"
+            bun --version
+
 jobs:
   lint:
     docker:
@@ -13,14 +25,7 @@ jobs:
 
       # Installing bun on a node image for now because official oven/bun image does not have git in it
       # which causes husky prepare to fail.
-      - run:
-          name: Install bun
-          command: |
-            curl -fsSL https://bun.sh/install | bash
-            echo 'export BUN_INSTALL="$HOME/.bun"' >> "$BASH_ENV"
-            echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> "$BASH_ENV"
-            source "$BASH_ENV"
-            bun --version
+      - install-bun
 
       - run:
           name: Restore packages
@@ -34,9 +39,13 @@ jobs:
           name: Check linting
           command: bun run lint
 
+      - run:
+          name: Run tests
+          command: bun run test
+
   build-and-test:
     docker:
-      - image: oven/bun:latest
+      - image: cimg/node:current
       - image: postgres:latest
         environment:
           POSTGRES_USER: postgres
@@ -44,10 +53,16 @@ jobs:
           POSTGRES_PASSWORD: postgres
     steps:
       - docker/install-dockerize
+      - install-bun
       - checkout
+
       - run:
           name: Restore packages
           command: bun install
+
+      - run:
+          name: Run tests
+          command: bun run test
 
 workflows:
   main:
