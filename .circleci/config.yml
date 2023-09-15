@@ -1,0 +1,46 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.2.0
+
+jobs:
+  lint:
+    docker:
+      - image: oven/bun:latest
+    steps:
+      - checkout
+      - run:
+          name: Restore packages
+          command: bun install
+
+      - run:
+          name: Check formatting
+          command: bun run format
+
+      - run:
+          name: Check linting
+          command: bun run lint
+  build-and-test:
+    docker:
+      - image: oven/bun:latest
+      - image: postgres:latest
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+    steps:
+      - docker/install-dockerize
+      - checkout
+      - run:
+          name: Restore packages
+          command: bun install
+
+      - run:
+          name: Run tests
+          command: bun run test
+
+workflows:
+  main:
+    jobs:
+      - lint
+      - build-and-test
