@@ -57,6 +57,10 @@ jobs:
           command: bun install
 
       - run:
+          name: Create env vars
+          command: bun run env
+
+      - run:
           name: Run tests
           command: bun run test
 
