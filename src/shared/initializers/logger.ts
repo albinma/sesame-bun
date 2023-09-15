@@ -1,3 +1,4 @@
+import { APP_CONFIGURATION } from '@/shared/configs/config';
 import { Logger, LoggerOptions, pino } from 'pino';
 
 const createLogger = (options: LoggerOptions): Logger => {
@@ -8,4 +9,6 @@ const createLogger = (options: LoggerOptions): Logger => {
   return pino(options);
 };
 
-export const logger = createLogger({ level: Bun.env.LOG_LEVEL });
+const { level } = APP_CONFIGURATION.logging;
+
+export const logger = createLogger({ level });
