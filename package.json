@@ -2,8 +2,8 @@
   "name": "sesame-bun",
   "version": "1.0.50",
   "scripts": {
-    "dev": "bun run --watch src/index.ts | pino-pretty",
-    "test": "bun test --coverage",
+    "dev": "NOD_ENV=development bun run --watch src/index.ts | pino-pretty",
+    "test": "NODE_ENV=test bun test --coverage",
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "lint": "eslint src",
