@@ -7,6 +7,16 @@
     {
       "type": "bun",
       "request": "launch",
+      "name": "Debug App",
+      "program": "src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false,
+      "watchMode": false,
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "bun",
+      "request": "launch",
       "name": "Debug File",
       "program": "${file}",
       "cwd": "${workspaceFolder}",

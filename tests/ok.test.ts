@@ -1,4 +1,6 @@
 import { setupApp } from '@/global/app';
+import { Express } from 'express';
+import request from 'supertest';
 
 describe('Can run tests', () => {
   it('should pass', () => {
@@ -7,15 +9,17 @@ describe('Can run tests', () => {
 });
 
 describe('HTTP server', () => {
-  const port = Bun.env.HTTP_PORT || 8080;
-  const app = setupApp().listen(port);
+  let app: Express;
 
-  afterAll(() => app.stop());
+  beforeAll(() => {
+    app = setupApp();
+  });
 
   it('should return ok', async () => {
-    const response = await app
-      .handle(new Request('http://localhost/'))
-      .then((res) => res.text());
+    const response = await request(app)
+      .get('/')
+      .expect(200)
+      .then((res) => res.text);
 
     expect(response).toBe('ok');
   });
