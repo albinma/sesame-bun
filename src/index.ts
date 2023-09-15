@@ -4,7 +4,7 @@ import { logger } from '@/shared/initializers/logger';
 import { AddressInfo } from 'ws';
 
 const { port } = APP_CONFIGURATION.http;
-const app = setupApp();
+const app = await setupApp();
 const server = app.listen(port, () => {
   logger.info('sesame-bun started');
 });

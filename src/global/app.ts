@@ -1,4 +1,6 @@
+import { createIdentityRouter } from '@/domains/identity/routes';
 import { logger } from '@/shared/initializers/logger';
+import { json } from 'body-parser';
 import express, {
   ErrorRequestHandler,
   Express,
@@ -10,10 +12,10 @@ import helmet from 'helmet';
 import { pinoHttp } from 'pino-http';
 import { v4 } from 'uuid';
 
-const OPEN_API_SPEC = 'data/openapi/openapi.yaml';
+const OPEN_API_SPEC = 'data/openapi/openapi.yml';
 
 // Disabling require return type rule for this because of the nature of chaining API derived types.
-export const setupApp = (): Express => {
+export const setupApp = async (): Promise<Express> => {
   const app = express();
 
   app.use(
@@ -38,6 +40,8 @@ export const setupApp = (): Express => {
     }),
   );
 
+  app.use(json());
+
   app.get('/', (req: Request, res: Response) => {
     res.send('ok');
   });
@@ -45,10 +49,13 @@ export const setupApp = (): Express => {
   app.use(
     OpenApiValidatorMiddlware({
       apiSpec: OPEN_API_SPEC,
+      validateApiSpec: false,
       validateRequests: true,
       validateResponses: true,
     }),
   );
+
+  app.use(await createIdentityRouter());
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
