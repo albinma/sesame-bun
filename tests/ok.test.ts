@@ -11,8 +11,8 @@ describe('Can run tests', () => {
 describe('HTTP server', () => {
   let app: Express;
 
-  beforeAll(() => {
-    app = setupApp();
+  beforeAll(async () => {
+    app = await setupApp();
   });
 
   it('should return ok', async () => {

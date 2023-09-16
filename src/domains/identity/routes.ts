@@ -1,8 +1,10 @@
-import { register, verify } from '@/domains/identity/handlers';
-import { setup } from '@/global/setup';
-import Elysia from 'elysia';
+import { beginAuthentication } from '@/domains/identity/handlers';
+import { Router } from 'express';
 
-export const authRoutes = new Elysia()
-  .use(setup)
-  .post('/register', register)
-  .post('/verify', verify);
+export async function createIdentityRouter(): Promise<Router> {
+  const router = Router();
+
+  router.post('/auth/begin', beginAuthentication);
+
+  return router;
+}
