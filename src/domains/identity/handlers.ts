@@ -8,6 +8,7 @@ import {
 import { prisma } from '@/shared/initializers/database';
 import { isAddress } from 'ethers';
 import { Request, Response } from 'express';
+import createHttpError from 'http-errors';
 import { generateNonce } from 'siwe';
 
 export async function beginAuthentication(
@@ -17,8 +18,7 @@ export async function beginAuthentication(
   const { publicAddress } = req.body;
 
   if (!isAddress(publicAddress)) {
-    // TODO: Add error handling
-    // throw new BadRequestError('Invalid public address');
+    throw new createHttpError.BadRequest('Invalid public address');
   }
 
   let user = await prisma.user.findUnique({ where: { publicAddress } });
