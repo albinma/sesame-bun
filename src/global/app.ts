@@ -1,6 +1,7 @@
 import { createIdentityRouter } from '@/domains/identity/routes';
 import { APP_CONFIGURATION } from '@/shared/configs/config';
 import { logger } from '@/shared/initializers/logger';
+import { errorHandlerMiddleware } from '@/shared/middlewares';
 import express, {
   ErrorRequestHandler,
   Express,
@@ -67,7 +68,16 @@ export const setupApp = async (): Promise<Express> => {
     });
   };
 
-  app.use(errorHandler);
+  // app.use(errorHandler);
+  app.use(errorHandlerMiddleware());
+
+  // app.use((err, req, res, next) => {
+  //   res.status(err.status || 500).json({
+  //     message: err.message,
+  //     errors: err.errors,
+  //     stack: APP_CONFIGURATION.environment !== 'production' ? err.stack : {},
+  //   });
+  // });
 
   return app;
 };
