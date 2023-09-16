@@ -1,4 +1,4 @@
 {
   "*": ["prettier --write -u"],
-  "*.ts": ["eslint"],
+  "*.ts": ["eslint"]
 }
