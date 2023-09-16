@@ -10,19 +10,20 @@
     "lint": "eslint src",
     "lint:fix": "eslint --fix src",
     "gen:types": "openapi-typescript data/openapi/openapi.yml -o data/openapi/openapi.d.ts --empty-objects-unknown && prettier --write data/openapi/openapi.d.ts",
-    "prepare": "husky install && bun gen:types"
+    "prepare": "husky install"
   },
   "dependencies": {
-    "@types/helmet": "^4.0.0",
+    "@types/helmet": "4.0.0",
     "@types/uuid": "9.0.4",
-    "body-parser": "^1.20.2",
+    "body-parser": "1.20.2",
     "bun": "1.0.0",
     "express": "4.18.2",
-    "express-openapi-validator": "^5.0.6",
-    "helmet": "^7.0.0",
-    "joi": "^17.10.1",
+    "express-openapi-validator": "5.0.6",
+    "helmet": "7.0.0",
+    "joi": "17.10.1",
     "pino": "8.15.1",
     "pino-http": "8.5.0",
+    "prisma": "5.3.1",
     "uuid": "9.0.1"
   },
   "devDependencies": {
@@ -37,7 +38,7 @@
     "eslint-plugin-prettier": "5.0.0",
     "husky": "8.0.0",
     "lint-staged": "14.0.1",
-    "openapi-typescript": "^6.6.1",
+    "openapi-typescript": "6.6.1",
     "pino-pretty": "10.2.0",
     "prettier": "3.0.3",
     "prettier-plugin-organize-imports": "3.2.3",
