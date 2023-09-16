@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-q', '-d', 'sesame', '-U', 'sesame']
+      timeout: 5s
+      interval: 10s
+      retries: 5
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./.docker/db:/var/lib/postgresql/data

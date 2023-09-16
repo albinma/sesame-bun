@@ -61,6 +61,10 @@ jobs:
           command: bun run env
 
       - run:
+          name: Migrate database
+          command: bun x prisma migrate dev
+
+      - run:
           name: Run tests
           command: bun run test
 

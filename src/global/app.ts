@@ -1,11 +1,11 @@
 import { createIdentityRouter } from '@/domains/identity/routes';
 import { logger } from '@/shared/initializers/logger';
-import { json } from 'body-parser';
 import express, {
   ErrorRequestHandler,
   Express,
   Request,
   Response,
+  json,
 } from 'express';
 import { middleware as OpenApiValidatorMiddlware } from 'express-openapi-validator';
 import helmet from 'helmet';
@@ -59,10 +59,13 @@ export const setupApp = async (): Promise<Express> => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    res.status(err.status || 500).json({
-      message: err.message,
-      errors: err.errors,
-    });
+    res
+      .status(err.status || 500)
+      .json({
+        message: err.message,
+        errors: err.errors,
+      })
+      .end();
   };
 
   app.use(errorHandler);

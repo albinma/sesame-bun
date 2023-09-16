@@ -10,13 +10,14 @@
     "lint": "eslint src",
     "lint:fix": "eslint --fix src",
     "gen:types": "openapi-typescript data/openapi/openapi.yml -o data/openapi/openapi.d.ts --empty-objects-unknown && prettier --write data/openapi/openapi.d.ts",
-    "prepare": "husky install"
+    "prepare": "husky install && bun x prisma generate"
   },
   "dependencies": {
+    "@prisma/client": "5.3.1",
     "@types/helmet": "4.0.0",
     "@types/uuid": "9.0.4",
-    "body-parser": "1.20.2",
     "bun": "1.0.0",
+    "ethers": "^6.7.1",
     "express": "4.18.2",
     "express-openapi-validator": "5.0.6",
     "helmet": "7.0.0",
@@ -24,6 +25,7 @@
     "pino": "8.15.1",
     "pino-http": "8.5.0",
     "prisma": "5.3.1",
+    "siwe": "^2.1.4",
     "uuid": "9.0.1"
   },
   "devDependencies": {

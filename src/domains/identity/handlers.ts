@@ -5,7 +5,10 @@ import {
   AuthCompleteResponse,
   AuthRefreshRequest,
 } from '@/domains/identity/models';
+import { prisma } from '@/shared/initializers/database';
+import { isAddress } from 'ethers';
 import { Request, Response } from 'express';
+import { generateNonce } from 'siwe';
 
 export async function beginAuthentication(
   req: Request<AuthBeginRequest>,
@@ -13,9 +16,27 @@ export async function beginAuthentication(
 ): Promise<void> {
   const { publicAddress } = req.body;
 
+  if (!isAddress(publicAddress)) {
+    // TODO: Add error handling
+    // throw new BadRequestError('Invalid public address');
+  }
+
+  let user = await prisma.user.findUnique({ where: { publicAddress } });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        publicAddress,
+        nonce: generateNonce(),
+      },
+    });
+  }
+
+  const { nonce } = user;
+
   res.send({
     publicAddress,
-    nonce: '0x1234567890abcdef',
+    nonce,
   });
 }
 
