@@ -22,6 +22,9 @@ export function errorHandlerMiddleware(): ErrorRequestHandler {
       title: 'Internal Server Error',
       detail: err?.message ?? 'An unknown error occurred',
       instance: req.url,
+      ...{
+        stack: APP_CONFIGURATION.environment !== 'production' ? err.stack : {},
+      },
     };
 
     if (err instanceof ApplicationError) {
@@ -35,10 +38,6 @@ export function errorHandlerMiddleware(): ErrorRequestHandler {
         status,
         detail: message,
         ...data,
-        ...{
-          stack:
-            APP_CONFIGURATION.environment !== 'production' ? err.stack : {},
-        },
       };
     }
 
