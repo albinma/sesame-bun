@@ -61,6 +61,10 @@ jobs:
           command: bun run env
 
       - run:
+          name: Wait for postgres to be ready
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run:
           name: Migrate database
           command: bun x prisma migrate dev
 
