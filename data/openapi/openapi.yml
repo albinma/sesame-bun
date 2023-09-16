@@ -28,7 +28,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthBeginResponse'
-
+  /auth/complete:
+    post:
+      summary: Completes the authentication process
+      description: Completes the authentication process by providing the public address of the user and the signed signature using the nonce.
+      tags:
+        - authentication
+      operationId: authentication.Complete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthCompleteRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthCompleteResponse'
+  /auth/refresh:
+    post:
+      summary: Gets a new access token using the refresh token
+      description: Refreshes the authentication process by providing the refresh token.
+      tags:
+        - authentication
+      operationId: authentication.Refresh
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRefreshRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthCompleteResponse'
 components:
   schemas:
     PublicAddress:
@@ -42,7 +79,7 @@ components:
         publicAddress:
           $ref: '#/components/schemas/PublicAddress'
       example:
-        publicAddress: '0xb794f5ea0ba39494ce839613fffba74279579268'
+        publicAddress: 0xb794f5ea0ba39494ce839613fffba74279579268
     AuthBeginResponse:
       type: object
       required:
@@ -56,5 +93,44 @@ components:
           type: string
           description: The nonce used for signature validation
       example:
-        publicAddress: '0xb794f5ea0ba39494ce839613fffba74279579268'
-        nonce: '0x1234567890abcdef'
+        publicAddress: 0xb794f5ea0ba39494ce839613fffba74279579268
+        nonce: 0x1234567890abcdef
+    AuthCompleteRequest:
+      type: object
+      required:
+        - publicAddress
+        - signature
+      properties:
+        publicAddress:
+          $ref: '#/components/schemas/PublicAddress'
+        signature:
+          type: string
+          description: The signature signed using the nonce
+      example:
+        publicAddress: 0xb794f5ea0ba39494ce839613fffba74279579268
+        signature: 0x1234567890abcdef0x1234567890abcdef0x1234567890abcdef
+    AuthCompleteResponse:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          description: The access token used for authentication
+        refreshToken:
+          type: string
+          description: The refresh token used for authentication
+      example:
+        accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        refreshToken: b9fb87f2893d8fdcbf8f65f6c7069485d013808115fbb9159edd247de2551883
+    AuthRefreshRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: The refresh token used for authentication
+      example:
+        refreshToken: b9fb87f2893d8fdcbf8f65f6c7069485d013808115fbb9159edd247de2551883

@@ -11,6 +11,20 @@ export interface paths {
      */
     post: operations['authentication.Begin'];
   };
+  '/auth/complete': {
+    /**
+     * Completes the authentication process
+     * @description Completes the authentication process by providing the public address of the user and the signed signature using the nonce.
+     */
+    post: operations['authentication.Complete'];
+  };
+  '/auth/refresh': {
+    /**
+     * Gets a new access token using the refresh token
+     * @description Refreshes the authentication process by providing the refresh token.
+     */
+    post: operations['authentication.Refresh'];
+  };
 }
 
 export type webhooks = Record<string, never>;
@@ -21,7 +35,7 @@ export interface components {
     PublicAddress: string;
     /**
      * @example {
-     *   "publicAddress": "0xb794f5ea0ba39494ce839613fffba74279579268"
+     *   "publicAddress": 1.0480672435017432e+48
      * }
      */
     AuthBeginRequest: {
@@ -29,14 +43,46 @@ export interface components {
     };
     /**
      * @example {
-     *   "publicAddress": "0xb794f5ea0ba39494ce839613fffba74279579268",
-     *   "nonce": "0x1234567890abcdef"
+     *   "publicAddress": 1.0480672435017432e+48,
+     *   "nonce": 1311768467294899700
      * }
      */
     AuthBeginResponse: {
       publicAddress: components['schemas']['PublicAddress'];
       /** @description The nonce used for signature validation */
       nonce: string;
+    };
+    /**
+     * @example {
+     *   "publicAddress": 1.0480672435017432e+48,
+     *   "signature": "0x1234567890abcdef0x1234567890abcdef0x1234567890abcdef"
+     * }
+     */
+    AuthCompleteRequest: {
+      publicAddress: components['schemas']['PublicAddress'];
+      /** @description The signature signed using the nonce */
+      signature: string;
+    };
+    /**
+     * @example {
+     *   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+     *   "refreshToken": "b9fb87f2893d8fdcbf8f65f6c7069485d013808115fbb9159edd247de2551883"
+     * }
+     */
+    AuthCompleteResponse: {
+      /** @description The access token used for authentication */
+      accessToken: string;
+      /** @description The refresh token used for authentication */
+      refreshToken: string;
+    };
+    /**
+     * @example {
+     *   "refreshToken": "b9fb87f2893d8fdcbf8f65f6c7069485d013808115fbb9159edd247de2551883"
+     * }
+     */
+    AuthRefreshRequest: {
+      /** @description The refresh token used for authentication */
+      refreshToken: string;
     };
   };
   responses: never;
@@ -66,6 +112,44 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['AuthBeginResponse'];
+        };
+      };
+    };
+  };
+  /**
+   * Completes the authentication process
+   * @description Completes the authentication process by providing the public address of the user and the signed signature using the nonce.
+   */
+  'authentication.Complete': {
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['AuthCompleteRequest'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AuthCompleteResponse'];
+        };
+      };
+    };
+  };
+  /**
+   * Gets a new access token using the refresh token
+   * @description Refreshes the authentication process by providing the refresh token.
+   */
+  'authentication.Refresh': {
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['AuthRefreshRequest'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AuthCompleteResponse'];
         };
       };
     };
