@@ -86,7 +86,8 @@ export async function completeAuthentication(
     const refreshToken =
       'b9fb87f2893d8fdcbf8f65f6c7069485d013808115fbb9159edd247de2551883';
 
-    req.session.save(() =>
+    // Destroy the session because it's no longer needed
+    req.session.destroy(() =>
       res.send({
         accessToken,
         refreshToken,
@@ -94,6 +95,7 @@ export async function completeAuthentication(
     );
   } catch (err) {
     req.log.error(err, 'Error completing authentication');
+    req.session.destroy(() => {});
     throw new UnauthorizedError();
   }
 }

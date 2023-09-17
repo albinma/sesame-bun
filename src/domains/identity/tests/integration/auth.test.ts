@@ -1,4 +1,3 @@
-import { AuthCompleteResponse } from '@/domains/identity/models';
 import { setupApp } from '@/global/app';
 import { ValidationProblem } from '@/shared/types';
 import { PrismaClient } from '@prisma/client';
@@ -102,13 +101,15 @@ describe('authentication', () => {
       .withCredentials(true)
       .set('Cookie', cookie)
       .send({ publicAddress, message, signature })
-      .expect(200)
-      .then((res) => res.body as AuthCompleteResponse);
+      .expect(200);
+
+    const { body: authCompleteResponseData } = authCompleteResponse;
 
     // assert
-    expect(authCompleteResponse).toBeDefined();
-    expect(authCompleteResponse.accessToken).toBeDefined();
-    expect(authCompleteResponse.refreshToken).toBeDefined();
+    expect(authCompleteResponseData).toBeDefined();
+    expect(authCompleteResponse.headers['Set-Cookie']).toBeUndefined(); // cookie should be cleared
+    expect(authCompleteResponseData.accessToken).toBeDefined();
+    expect(authCompleteResponseData.refreshToken).toBeDefined();
 
     const user = await prisma.user.findUnique({ where: { publicAddress } });
     expect(user).not.toBeNull();
