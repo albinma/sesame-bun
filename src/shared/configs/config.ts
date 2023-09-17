@@ -12,6 +12,7 @@ const schema = joi.object({
   http: joi
     .object({
       port: joi.number().required().default(8080),
+      sessionCookieSecret: joi.string().required(),
     })
     .required(),
 
@@ -43,6 +44,7 @@ export type ApplicationConfiguration = {
   timezone: string;
   http: {
     port: number;
+    sessionCookieSecret: string;
   };
   logging: {
     level: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
@@ -61,6 +63,7 @@ const APP_CONFIGURATION: ApplicationConfiguration = {
   timezone: Bun.env.TZ ?? 'UTC',
   http: {
     port: Number(Bun.env.HTTP_PORT),
+    sessionCookieSecret: String(Bun.env.HTTP_SESSION_COOKIE_SECRET),
   },
   logging: {
     level: Bun.env.LOG_LEVEL,

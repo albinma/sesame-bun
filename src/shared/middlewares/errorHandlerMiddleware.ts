@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { APP_CONFIGURATION } from '@/shared/configs/config';
 import { ApplicationError, SupportedHttpStatusCode } from '@/shared/errors';
 import { Problem } from '@/shared/types';
 import { ErrorRequestHandler } from 'express';
@@ -22,10 +21,7 @@ export function errorHandlerMiddleware(): ErrorRequestHandler {
       status: 500,
       title: 'Internal Server Error',
       detail: err?.message ?? 'An unknown error occurred',
-      instance: req.url,
-      ...{
-        stack: APP_CONFIGURATION.environment !== 'production' ? err.stack : {},
-      },
+      instance: req.protocol + '://' + req.get('host') + req.originalUrl,
     };
 
     if (err instanceof ApplicationError) {

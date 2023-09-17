@@ -138,7 +138,6 @@ components:
       properties:
         type:
           type: string
-          format: uri
           description: URI reference that identifies the problem type
           default: about:blank
         status:

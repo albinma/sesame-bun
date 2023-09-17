@@ -1,15 +1,9 @@
 import { createIdentityRouter } from '@/domains/identity/routes';
-import { APP_CONFIGURATION } from '@/shared/configs/config';
 import { logger } from '@/shared/initializers/logger';
+import { createSession } from '@/shared/initializers/session';
 import { errorHandlerMiddleware } from '@/shared/middlewares';
 import compression from 'compression';
-import express, {
-  ErrorRequestHandler,
-  Express,
-  Request,
-  Response,
-  json,
-} from 'express';
+import express, { Express, Request, Response, json } from 'express';
 import { middleware as OpenApiValidatorMiddlware } from 'express-openapi-validator';
 import helmet from 'helmet';
 import { pinoHttp } from 'pino-http';
@@ -29,6 +23,8 @@ export const setupApp = async (): Promise<Express> => {
   );
 
   app.use(compression());
+
+  app.use(createSession());
 
   // Generate request id that will correlate all logs for a single request.
   app.use((req, res, next) => {
@@ -56,31 +52,12 @@ export const setupApp = async (): Promise<Express> => {
       apiSpec: OPEN_API_SPEC,
       validateApiSpec: false,
       validateRequests: true,
-      validateResponses: false,
+      validateResponses: true,
     }),
   );
 
   app.use(await createIdentityRouter());
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    res.status(err.status || 500).json({
-      message: err.message,
-      errors: err.errors,
-      stack: APP_CONFIGURATION.environment !== 'production' ? err.stack : {},
-    });
-  };
-
-  // app.use(errorHandler);
   app.use(errorHandlerMiddleware());
-
-  // app.use((err, req, res, next) => {
-  //   res.status(err.status || 500).json({
-  //     message: err.message,
-  //     errors: err.errors,
-  //     stack: APP_CONFIGURATION.environment !== 'production' ? err.stack : {},
-  //   });
-  // });
 
   return app;
 };

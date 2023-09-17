@@ -24,18 +24,7 @@ export async function beginAuthentication(
   const publicAddress = getAddress(requestPublicAddress);
   const nonce = generateNonce();
 
-  await prisma.user.upsert({
-    create: {
-      publicAddress,
-      nonce,
-    },
-    update: {
-      nonce,
-    },
-    where: {
-      publicAddress,
-    },
-  });
+  req.session.nonce = nonce;
 
   res.send({
     publicAddress,
@@ -48,13 +37,23 @@ export async function completeAuthentication(
   res: Response<AuthCompleteResponse>,
 ): Promise<void> {
   try {
-    const { publicAddress, message, signature } = req.body;
-    const user = await prisma.user.findUnique({ where: { publicAddress } });
+    const {
+      publicAddress: requestPublicAddress,
+      message,
+      signature,
+    } = req.body;
 
-    if (!user) {
-      throw new Error('User not found');
+    if (!isAddress(requestPublicAddress)) {
+      throw new ValidationError('publicAddress', 'Invalid public address');
     }
-    const { nonce } = user;
+
+    const publicAddress = getAddress(requestPublicAddress);
+    const { nonce } = req.session;
+
+    if (!nonce) {
+      throw new Error("Nonce doesn't exist in session");
+    }
+
     const siwe = new SiweMessage(message);
     const { data } = await siwe.verify({ signature, nonce });
 
@@ -62,32 +61,41 @@ export async function completeAuthentication(
       throw new Error('Invalid signature');
     }
 
-    await prisma.user.update({
-      data: {
-        nonce: generateNonce(),
+    if (data.expirationTime) {
+      req.session.cookie.expires = new Date(data.expirationTime);
+    }
+    const lastVerifiedAt = new Date();
+    const user = await prisma.user.upsert({
+      create: {
+        publicAddress,
+        nonce,
+        lastVerifiedAt,
+      },
+      update: {
+        nonce,
+        lastVerifiedAt,
       },
       where: {
         publicAddress,
       },
     });
 
-    res.send({
-      accessToken: 'TODO: ' + user.publicAddress,
-      refreshToken: 'TODO',
-    });
+    const accessToken =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c_' +
+      user.publicAddress;
+    const refreshToken =
+      'b9fb87f2893d8fdcbf8f65f6c7069485d013808115fbb9159edd247de2551883';
+
+    req.session.save(() =>
+      res.send({
+        accessToken,
+        refreshToken,
+      }),
+    );
   } catch (err) {
     req.log.error(err, 'Error completing authentication');
     throw new UnauthorizedError();
   }
-
-  const accessToken =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
-  const refreshToken =
-    'b9fb87f2893d8fdcbf8f65f6c7069485d013808115fbb9159edd247de2551883';
-  res.send({
-    accessToken,
-    refreshToken,
-  });
 }
 
 export async function refreshAuthentication(
