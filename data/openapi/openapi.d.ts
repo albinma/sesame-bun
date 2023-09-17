@@ -110,6 +110,8 @@ export interface components {
      */
     AuthCompleteRequest: {
       publicAddress: components['schemas']['PublicAddress'];
+      /** @description The signed message used in verification */
+      message?: string;
       /** @description The signature signed using the nonce */
       signature: string;
     };

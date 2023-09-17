@@ -7,7 +7,7 @@ import {
 } from '@/domains/identity/models';
 import { ValidationError } from '@/shared/errors';
 import { prisma } from '@/shared/initializers/database';
-import { isAddress } from 'ethers';
+import { getAddress, isAddress } from 'ethers';
 import { Request, Response } from 'express';
 import { generateNonce } from 'siwe';
 
@@ -15,24 +15,27 @@ export async function beginAuthentication(
   req: Request<AuthBeginRequest>,
   res: Response<AuthBeginResponse>,
 ): Promise<void> {
-  const { publicAddress } = req.body;
+  const { publicAddress: requestPublicAddress } = req.body;
 
-  if (!isAddress(publicAddress)) {
+  if (!isAddress(requestPublicAddress)) {
     throw new ValidationError('publicAddress', 'Invalid public address');
   }
 
-  let user = await prisma.user.findUnique({ where: { publicAddress } });
+  const publicAddress = getAddress(requestPublicAddress);
+  const nonce = generateNonce();
 
-  if (!user) {
-    user = await prisma.user.create({
-      data: {
-        publicAddress,
-        nonce: generateNonce(),
-      },
-    });
-  }
-
-  const { nonce } = user;
+  await prisma.user.upsert({
+    create: {
+      publicAddress,
+      nonce,
+    },
+    update: {
+      nonce,
+    },
+    where: {
+      publicAddress,
+    },
+  });
 
   res.send({
     publicAddress,
@@ -44,6 +47,8 @@ export async function completeAuthentication(
   req: Request<AuthCompleteRequest>,
   res: Response<AuthCompleteResponse>,
 ): Promise<void> {
+  // const { publicAddress, message, signature } = req.body;
+
   const accessToken =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
   const refreshToken =

@@ -221,6 +221,9 @@ components:
       properties:
         publicAddress:
           $ref: '#/components/schemas/PublicAddress'
+        message:
+          type: string
+          description: The signed message used in verification
         signature:
           type: string
           description: The signature signed using the nonce
