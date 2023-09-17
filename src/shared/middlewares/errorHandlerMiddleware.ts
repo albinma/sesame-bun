@@ -4,6 +4,7 @@ import { APP_CONFIGURATION } from '@/shared/configs/config';
 import { ApplicationError, SupportedHttpStatusCode } from '@/shared/errors';
 import { Problem } from '@/shared/types';
 import { ErrorRequestHandler } from 'express';
+import { HttpError } from 'express-openapi-validator/dist/framework/types';
 
 const titleMap = new Map<SupportedHttpStatusCode, string>([
   [400, 'Bad Request'],
@@ -38,6 +39,17 @@ export function errorHandlerMiddleware(): ErrorRequestHandler {
         status,
         detail: message,
         ...data,
+      };
+    } else if (err instanceof HttpError) {
+      const { status, message, errors } = err;
+
+      problem = {
+        ...problem,
+        type: 'err_http',
+        title: message,
+        status,
+        detail: message,
+        ...{ errors },
       };
     }
 

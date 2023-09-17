@@ -5,11 +5,11 @@ import {
   AuthCompleteResponse,
   AuthRefreshRequest,
 } from '@/domains/identity/models';
-import { ValidationError } from '@/shared/errors';
+import { UnauthorizedError, ValidationError } from '@/shared/errors';
 import { prisma } from '@/shared/initializers/database';
 import { getAddress, isAddress } from 'ethers';
 import { Request, Response } from 'express';
-import { generateNonce } from 'siwe';
+import { SiweMessage, generateNonce } from 'siwe';
 
 export async function beginAuthentication(
   req: Request<AuthBeginRequest>,
@@ -47,7 +47,38 @@ export async function completeAuthentication(
   req: Request<AuthCompleteRequest>,
   res: Response<AuthCompleteResponse>,
 ): Promise<void> {
-  // const { publicAddress, message, signature } = req.body;
+  try {
+    const { publicAddress, message, signature } = req.body;
+    const user = await prisma.user.findUnique({ where: { publicAddress } });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const { nonce } = user;
+    const siwe = new SiweMessage(message);
+    const { data } = await siwe.verify({ signature, nonce });
+
+    if (!data) {
+      throw new Error('Invalid signature');
+    }
+
+    await prisma.user.update({
+      data: {
+        nonce: generateNonce(),
+      },
+      where: {
+        publicAddress,
+      },
+    });
+
+    res.send({
+      accessToken: 'TODO: ' + user.publicAddress,
+      refreshToken: 'TODO',
+    });
+  } catch (err) {
+    req.log.error(err, 'Error completing authentication');
+    throw new UnauthorizedError();
+  }
 
   const accessToken =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
