@@ -1,16 +1,11 @@
 import { createIdentityRouter } from '@/domains/identity/routes';
 import { logger } from '@/shared/initializers/logger';
-import { json } from 'body-parser';
-import express, {
-  ErrorRequestHandler,
-  Express,
-  Request,
-  Response,
-} from 'express';
+import { errorHandlerMiddleware } from '@/shared/middlewares';
+import compression from 'compression';
+import express, { Express, Request, Response, json } from 'express';
 import { middleware as OpenApiValidatorMiddlware } from 'express-openapi-validator';
 import helmet from 'helmet';
 import { pinoHttp } from 'pino-http';
-import { v4 } from 'uuid';
 
 const OPEN_API_SPEC = 'data/openapi/openapi.yml';
 
@@ -25,9 +20,11 @@ export const setupApp = async (): Promise<Express> => {
     }),
   );
 
+  app.use(compression());
+
   // Generate request id that will correlate all logs for a single request.
   app.use((req, res, next) => {
-    req.id = v4();
+    req.id = crypto.randomUUID();
     res.set('X-Request-Id', req.id);
     next();
   });
@@ -56,16 +53,7 @@ export const setupApp = async (): Promise<Express> => {
   );
 
   app.use(await createIdentityRouter());
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    res.status(err.status || 500).json({
-      message: err.message,
-      errors: err.errors,
-    });
-  };
-
-  app.use(errorHandler);
+  app.use(errorHandlerMiddleware());
 
   return app;
 };
