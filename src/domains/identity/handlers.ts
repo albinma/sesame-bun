@@ -5,19 +5,20 @@ import {
   AuthCompleteResponse,
   AuthRefreshRequest,
 } from '@/domains/identity/models';
-import { APP_CONFIGURATION } from '@/shared/configs/config';
+import { APP_CONFIGURATION } from '@/shared/configs';
 import { UnauthorizedError, ValidationError } from '@/shared/errors';
 import { prisma } from '@/shared/initializers/database';
+import { TypedRequest } from '@/shared/types';
 import { generate256BitSecret } from '@/utils/crypto-utils';
 import { User } from '@prisma/client';
-import { getAddress, isAddress } from 'ethers';
-import { Request, Response } from 'express';
+import { getAddress, isAddress, isBytesLike } from 'ethers';
+import { Response } from 'express';
 import { SignJWT } from 'jose';
 import { DateTime } from 'luxon';
 import { SiweMessage, generateNonce } from 'siwe';
 
 export async function beginAuthentication(
-  req: Request<AuthBeginRequest>,
+  req: TypedRequest<AuthBeginRequest>,
   res: Response<AuthBeginResponse>,
 ): Promise<void> {
   const { publicAddress: requestPublicAddress } = req.body;
@@ -38,20 +39,20 @@ export async function beginAuthentication(
 }
 
 export async function completeAuthentication(
-  req: Request<AuthCompleteRequest>,
+  req: TypedRequest<AuthCompleteRequest>,
   res: Response<AuthCompleteResponse>,
 ): Promise<void> {
+  const { publicAddress: requestPublicAddress, message, signature } = req.body;
+
+  if (!isAddress(requestPublicAddress)) {
+    throw new ValidationError('publicAddress', 'Invalid public address');
+  }
+
+  if (!isBytesLike(signature)) {
+    throw new ValidationError('signature', 'Invalid signature');
+  }
+
   try {
-    const {
-      publicAddress: requestPublicAddress,
-      message,
-      signature,
-    } = req.body;
-
-    if (!isAddress(requestPublicAddress)) {
-      throw new ValidationError('publicAddress', 'Invalid public address');
-    }
-
     const publicAddress = getAddress(requestPublicAddress);
     const { nonce } = req.session;
 
@@ -60,15 +61,10 @@ export async function completeAuthentication(
     }
 
     const siwe = new SiweMessage(message);
-    const { data } = await siwe.verify({ signature, nonce });
 
-    if (!data) {
-      throw new Error('Invalid signature');
-    }
+    // no need to capture response, throws error if message invalid
+    await siwe.verify({ signature, nonce });
 
-    if (data.expirationTime) {
-      req.session.cookie.expires = new Date(data.expirationTime);
-    }
     const lastVerifiedAt = new Date();
     const user = await prisma.user.upsert({
       create: {
@@ -101,7 +97,7 @@ export async function completeAuthentication(
 }
 
 export async function refreshAuthentication(
-  req: Request<AuthRefreshRequest>,
+  req: TypedRequest<AuthRefreshRequest>,
   res: Response<AuthCompleteResponse>,
 ): Promise<void> {
   try {
@@ -124,7 +120,7 @@ export async function refreshAuthentication(
       refreshToken: newToken,
     });
   } catch (err) {
-    req.log.error(err, 'Error refreshing authentication');
+    req.log.warn(err, 'Error refreshing authentication');
     throw new UnauthorizedError();
   }
 }

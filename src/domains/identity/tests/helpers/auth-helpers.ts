@@ -1,4 +1,5 @@
 import { AuthCompleteResponse } from '@/domains/identity/models';
+import { CLIENT_CONFIGURATION } from '@/shared/configs';
 import { HDNodeWallet } from 'ethers';
 import { Express } from 'express';
 import { SiweMessage } from 'siwe';
@@ -31,6 +32,13 @@ export async function createTestSiweMessage(
   return { siweMessage, message, signature };
 }
 
+export function createClientBasicAuthToken(): string {
+  const [{ clientId, clientSecret }] = CLIENT_CONFIGURATION.allowedClients;
+  return `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString(
+    'base64',
+  )}`;
+}
+
 export async function requestAccessToken(
   app: Express,
   wallet: HDNodeWallet,
@@ -38,6 +46,7 @@ export async function requestAccessToken(
   const publicAddress = wallet.address;
   const authBeginResponse = await request(app)
     .post('/auth/begin')
+    .set('Authorization', createClientBasicAuthToken())
     .send({ publicAddress })
     .expect(200);
 
@@ -47,6 +56,7 @@ export async function requestAccessToken(
 
   const { accessToken, refreshToken } = await request(app)
     .post('/auth/complete')
+    .set('Authorization', createClientBasicAuthToken())
     .set('Cookie', cookie)
     .send({ publicAddress, message, signature })
     .expect(200)

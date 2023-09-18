@@ -34,7 +34,6 @@ export interface components {
     /** @description A Problem Details object (RFC 9457) */
     Problem: {
       /**
-       * Format: uri
        * @description URI reference that identifies the problem type
        * @default about:blank
        */
@@ -111,7 +110,7 @@ export interface components {
     AuthCompleteRequest: {
       publicAddress: components['schemas']['PublicAddress'];
       /** @description The signed message used in verification */
-      message?: string;
+      message: string;
       /** @description The signature signed using the nonce */
       signature: string;
     };
@@ -204,6 +203,7 @@ export interface operations {
         };
       };
       400: components['responses']['400'];
+      401: components['responses']['401'];
       422: components['responses']['422'];
       500: components['responses']['500'];
     };

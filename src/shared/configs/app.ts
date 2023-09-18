@@ -50,8 +50,6 @@ const schema = joi.object({
     .default(),
 });
 
-schema.validate(Bun.env).error;
-
 export type ApplicationConfiguration = {
   environment: 'development' | 'test' | 'production';
   timezone: string;
@@ -79,7 +77,7 @@ export type ApplicationConfiguration = {
   };
 };
 
-const APP_CONFIGURATION: ApplicationConfiguration = {
+export const APP_CONFIGURATION: ApplicationConfiguration = {
   environment: Bun.env.NODE_ENV as 'development' | 'test' | 'production',
   timezone: Bun.env.TZ ?? 'UTC',
   http: {
@@ -111,7 +109,5 @@ const { error } = schema
   .validate(APP_CONFIGURATION);
 
 if (error) {
-  throw new Error(`Config validation error: ${error.message}`);
+  throw new Error(`App config validation error: ${error.message}`);
 }
-
-export { APP_CONFIGURATION };
