@@ -94,7 +94,7 @@ export async function completeAuthentication(
       }),
     );
   } catch (err) {
-    req.log.error(err, 'Error completing authentication');
+    req.log.warn(err, 'Error completing authentication');
     req.session.destroy(() => {});
     throw new UnauthorizedError();
   }

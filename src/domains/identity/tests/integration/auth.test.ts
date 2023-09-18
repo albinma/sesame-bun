@@ -70,6 +70,29 @@ describe('authentication', () => {
     ).toBeTruthy();
   });
 
+  it('/auth/begin should return 400 on invalid payload', async () => {
+    // arrange
+    const publicAddress = null;
+
+    // act
+    const response = await request(app)
+      .post('/auth/begin')
+      .send({ publicAddress })
+      .expect(400)
+      .then((res) => res.body as ValidationProblem);
+
+    // assert
+    expect(response).toBeDefined();
+    expect(response.status).toBe(400);
+    expect(response.errors).toHaveLength(1);
+    expect(
+      response.errors?.every(
+        (e) =>
+          e.name === '/body/publicAddress' && e.reason === 'must be string',
+      ),
+    ).toBeTruthy();
+  });
+
   it('/auth/begin should return 200', async () => {
     // arrange
     const wallet = Wallet.createRandom();
