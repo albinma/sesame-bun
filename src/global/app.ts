@@ -7,7 +7,6 @@ import express, { Express, Request, Response, json } from 'express';
 import { middleware as OpenApiValidatorMiddlware } from 'express-openapi-validator';
 import helmet from 'helmet';
 import { pinoHttp } from 'pino-http';
-import { v4 } from 'uuid';
 
 const OPEN_API_SPEC = 'data/openapi/openapi.yml';
 
@@ -28,7 +27,7 @@ export const setupApp = async (): Promise<Express> => {
 
   // Generate request id that will correlate all logs for a single request.
   app.use((req, res, next) => {
-    req.id = v4();
+    req.id = crypto.randomUUID();
     res.set('X-Request-Id', req.id);
     next();
   });

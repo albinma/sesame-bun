@@ -13,7 +13,6 @@ datasource db {
 model User {
   id             Int            @id @default(autoincrement())
   publicAddress  String         @unique @map("public_address") @db.VarChar(44)
-  nonce          String         @db.VarChar(255)
   lastVerifiedAt DateTime?      @map("last_verified_at")
   isAdmin        Boolean        @default(false) @map("is_admin")
   createdAt      DateTime       @default(now()) @map("created_at")
@@ -25,8 +24,8 @@ model User {
 
 model RefreshToken {
   id        Int      @id @default(autoincrement())
-  token     String   @unique
-  userId    Int      @map("user_id")
+  token     String   @unique @db.VarChar(64)
+  userId    Int      @unique @map("user_id")
   user      User     @relation(fields: [userId], references: [id])
   expiresAt DateTime @map("expires_at")
   createdAt DateTime @default(now()) @map("created_at")

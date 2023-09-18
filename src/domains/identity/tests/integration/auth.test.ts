@@ -1,3 +1,4 @@
+import { AuthCompleteResponse } from '@/domains/identity/models';
 import { setupApp } from '@/global/app';
 import { ValidationProblem } from '@/shared/types';
 import { PrismaClient } from '@prisma/client';
@@ -67,7 +68,7 @@ describe('authentication', () => {
     ).toBeTruthy();
   });
 
-  it('should authentication successfully', async () => {
+  it('should authentication successfully and also refresh token', async () => {
     // arrange
     const wallet = Wallet.createRandom();
     const publicAddress = wallet.address;
@@ -98,16 +99,16 @@ describe('authentication', () => {
 
     const authCompleteResponse = await request(app)
       .post('/auth/complete')
-      .withCredentials(true)
       .set('Cookie', cookie)
       .send({ publicAddress, message, signature })
       .expect(200);
 
-    const { body: authCompleteResponseData } = authCompleteResponse;
+    const authCompleteResponseData =
+      authCompleteResponse.body as AuthCompleteResponse;
 
     // assert
-    expect(authCompleteResponseData).toBeDefined();
     expect(authCompleteResponse.headers['Set-Cookie']).toBeUndefined(); // cookie should be cleared
+    expect(authCompleteResponseData).toBeDefined();
     expect(authCompleteResponseData.accessToken).toBeDefined();
     expect(authCompleteResponseData.refreshToken).toBeDefined();
 
@@ -116,9 +117,39 @@ describe('authentication', () => {
 
     if (user) {
       expect(user.publicAddress).toBe(publicAddress);
-      expect(user.nonce).toBe(nonce);
       expect(user.isAdmin).toBeFalsy();
       expect(user.lastVerifiedAt).not.toBeNull();
+
+      const refreshToken = await prisma.refreshToken.findUnique({
+        where: { token: authCompleteResponseData.refreshToken },
+      });
+
+      expect(refreshToken).not.toBeNull();
+
+      if (refreshToken) {
+        expect(refreshToken.userId).toBe(user.id);
+        expect(refreshToken.expiresAt).not.toBeNull();
+
+        const authRefreshResponseData = await request(app)
+          .post('/auth/refresh')
+          .send({ refreshToken: authCompleteResponseData.refreshToken })
+          .expect(200)
+          .then((res) => res.body as AuthCompleteResponse);
+
+        expect(authRefreshResponseData.accessToken).toBeDefined();
+        expect(authRefreshResponseData.refreshToken).toBeDefined();
+
+        const newRefreshToken = await prisma.refreshToken.findUnique({
+          where: { token: authRefreshResponseData.refreshToken },
+        });
+
+        expect(newRefreshToken).not.toBeNull();
+
+        if (newRefreshToken) {
+          expect(newRefreshToken.userId).toBe(user.id);
+          expect(newRefreshToken.expiresAt).not.toBeNull();
+        }
+      }
     }
   });
 });
