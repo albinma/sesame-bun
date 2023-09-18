@@ -1,5 +1,5 @@
 import { setupApp } from '@/global/app';
-import { APP_CONFIGURATION } from '@/shared/configs/config';
+import { APP_CONFIGURATION } from '@/shared/configs';
 import { logger } from '@/shared/initializers/logger';
 import { AddressInfo } from 'ws';
 

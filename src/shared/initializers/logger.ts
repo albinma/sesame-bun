@@ -1,4 +1,4 @@
-import { APP_CONFIGURATION } from '@/shared/configs/config';
+import { APP_CONFIGURATION } from '@/shared/configs';
 import { Logger, LoggerOptions, pino } from 'pino';
 
 const createLogger = (options: LoggerOptions): Logger => {

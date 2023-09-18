@@ -30,6 +30,8 @@ paths:
                 $ref: '#/components/schemas/AuthBeginResponse'
         '400':
           $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
         '422':
           $ref: '#/components/responses/422'
         '500':
@@ -216,6 +218,7 @@ components:
       type: object
       required:
         - publicAddress
+        - message
         - signature
       properties:
         publicAddress:
