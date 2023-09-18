@@ -1,3 +1,4 @@
+import { APP_CONFIGURATION } from '@/shared/configs/config';
 import { RequestHandler } from 'express';
 import session from 'express-session';
 
@@ -13,7 +14,7 @@ export function createSession(): RequestHandler {
   return session({
     store: MemoryStore,
     name: 'sesame-bun',
-    secret: 'siwe-quickstart-secret',
+    secret: APP_CONFIGURATION.http.sessionCookieSecret,
     resave: true,
     saveUninitialized: true,
     cookie: {

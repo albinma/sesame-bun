@@ -17,8 +17,8 @@ const titleMap = new Map<SupportedHttpStatusCode, string>([
 export function errorHandlerMiddleware(): ErrorRequestHandler {
   return (err, req, res, next) => {
     let problem: Problem = {
-      type: 'about:blank',
-      status: 500,
+      type: err.type ?? 'about:blank',
+      status: err.status ?? 500,
       title: 'Internal Server Error',
       detail: err?.message ?? 'An unknown error occurred',
       instance: req.protocol + '://' + req.get('host') + req.originalUrl,
@@ -36,16 +36,21 @@ export function errorHandlerMiddleware(): ErrorRequestHandler {
         detail: message,
         ...data,
       };
-    } else if (err instanceof HttpError) {
+    }
+    // OpenAPI Validator Error
+    else if (err instanceof HttpError) {
       const { status, message, errors } = err;
-
+      const mappedErrors = errors.map((error) => ({
+        name: error.path,
+        reason: error.message,
+      }));
       problem = {
         ...problem,
         type: 'err_http',
         title: message,
         status,
         detail: message,
-        ...{ errors },
+        ...{ errors: mappedErrors },
       };
     }
 

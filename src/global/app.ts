@@ -1,6 +1,5 @@
 import { createIdentityRouter } from '@/domains/identity/routes';
 import { logger } from '@/shared/initializers/logger';
-import { createSession } from '@/shared/initializers/session';
 import { errorHandlerMiddleware } from '@/shared/middlewares';
 import compression from 'compression';
 import express, { Express, Request, Response, json } from 'express';
@@ -22,8 +21,6 @@ export const setupApp = async (): Promise<Express> => {
   );
 
   app.use(compression());
-
-  app.use(createSession());
 
   // Generate request id that will correlate all logs for a single request.
   app.use((req, res, next) => {
