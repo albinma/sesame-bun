@@ -8,23 +8,24 @@ import {
   requestAccessToken,
 } from '@/domains/identity/tests/helpers/auth-helpers';
 import { setupApp } from '@/global/app';
+import { prisma } from '@/shared/initializers/database';
+import { redis } from '@/shared/initializers/redis';
 import { Problem, ValidationProblem } from '@/shared/types';
-import { PrismaClient } from '@prisma/client';
+import { afterAll, beforeEach, describe, expect, it } from 'bun:test';
 import { Wallet } from 'ethers';
 import { Express } from 'express';
 import request from 'supertest';
 
 describe('authentication', () => {
   let app: Express;
-  let prisma: PrismaClient;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await setupApp();
-    prisma = new PrismaClient();
   });
 
   afterAll(async () => {
-    await prisma.$disconnect();
+    redis.disconnect();
+    await redis.quit();
   });
 
   it('/auth/begin should return 200', async () => {

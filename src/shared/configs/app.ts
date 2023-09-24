@@ -48,6 +48,13 @@ const schema = joi.object({
       refreshTokenExpiresInSeconds: joi.number().required(),
     })
     .default(),
+  redis: joi
+    .object({
+      host: joi.string().required().default('localhost'),
+      port: joi.number().required().default(6379),
+      password: joi.string().required(),
+    })
+    .default(),
 });
 
 export type ApplicationConfiguration = {
@@ -75,6 +82,11 @@ export type ApplicationConfiguration = {
     expiresIn: string;
     refreshTokenExpiresInSeconds: number;
   };
+  redis: {
+    host: string;
+    port: number;
+    password: string;
+  };
 };
 
 export const APP_CONFIGURATION: ApplicationConfiguration = {
@@ -101,6 +113,11 @@ export const APP_CONFIGURATION: ApplicationConfiguration = {
     audience: String(Bun.env.JWT_AUDIENCE),
     expiresIn: String(Bun.env.JWT_EXPIRES_IN),
     refreshTokenExpiresInSeconds: Number(Bun.env.JWT_REFRESH_TOKEN_EXPIRES_IN),
+  },
+  redis: {
+    host: String(Bun.env.REDIS_HOST),
+    port: Number(Bun.env.REDIS_PORT),
+    password: String(Bun.env.REDIS_PASSWORD),
   },
 };
 

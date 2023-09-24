@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres
+    image: postgres:latest
     restart: always
     healthcheck:
       test: ['CMD', 'pg_isready', '-q', '-d', 'sesame', '-U', 'sesame']
@@ -15,3 +15,13 @@ services:
       - '5432:5432'
     volumes:
       - ./.docker/db:/var/lib/postgresql/data
+  redis:
+    image: redis:latest
+    restart: always
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+    ports:
+      - '6379:6379'
+    environment:
+      REDIS_PASSWORD: panther
+      ALLOW_EMPTY_PASSWORD: no

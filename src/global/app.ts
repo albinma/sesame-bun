@@ -20,6 +20,9 @@ export const setupApp = async (): Promise<Express> => {
     }),
   );
 
+  // For when the app is behind a proxy, like in a docker container or in a kubernetes cluster.
+  app.set('trust proxy', 1);
+
   app.use(compression());
 
   // Generate request id that will correlate all logs for a single request.
