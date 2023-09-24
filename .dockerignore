@@ -1,0 +1,16 @@
+.circleci/
+.docker/
+.husky/
+.vscode/
+dist/
+node_modules/
+.editorconfig
+.eslintignore
+.eslintrc.jsson
+.gitignore
+.lintstagedrc
+.prettierignore
+.prettierrc
+compose.yml
+LICENSE
+README.md
