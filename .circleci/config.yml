@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  docker: circleci/docker@2.3.0
+  docker: circleci/docker@2.4.0
 
 commands:
   install-bun:
@@ -15,6 +15,16 @@ commands:
             source "$BASH_ENV"
             bun --version
 
+  install-git:
+    steps:
+      - run:
+          name: 'Install git'
+          command: |
+            apt-get update
+            apt-get install -y git
+            apt-get clean
+            rm -rf /var/lib/apt/lists/*
+
 jobs:
   lint:
     docker:
@@ -26,6 +36,10 @@ jobs:
       # Installing bun on a node image for now because official oven/bun image does not have git in it
       # which causes husky prepare to fail.
       - install-bun
+
+      # Installing git on a bun image because husky needs it
+      # https://github.com/oven-sh/bun/issues/4687
+      # - install-git
 
       - run:
           name: Restore packages
@@ -42,6 +56,7 @@ jobs:
   build-and-test:
     docker:
       - image: cimg/node:current
+      # - image: oven/bun:latest
       - image: postgres:latest
         environment:
           POSTGRES_USER: postgres
@@ -49,8 +64,15 @@ jobs:
           POSTGRES_PASSWORD: postgres
     steps:
       - docker/install-dockerize
-      - install-bun
       - checkout
+
+      # Installing bun on a node image for now because official oven/bun image does not have git in it
+      # which causes husky prepare to fail.
+      - install-bun
+
+      # Installing git on a bun image because husky needs it
+      # https://github.com/oven-sh/bun/issues/4687
+      # - install-git
 
       - run:
           name: Restore packages
