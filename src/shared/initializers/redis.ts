@@ -21,6 +21,10 @@ export const createRedis = (): Redis => {
     logger.error(error, 'Redis error');
   });
 
+  redis.on('close', () => {
+    logger.info('Redis closed');
+  });
+
   return redis;
 };
 
